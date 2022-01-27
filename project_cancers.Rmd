@@ -1,0 +1,946 @@
+```{r}
+load("project_cancer.RData")
+library(dplyr)
+library(ggplot2)
+library(plot3D)
+library(plotly)
+library(tidyverse)
+library(naniar)
+library(magrittr)
+library(qwraps2)
+library(ranger)
+library(ggfortify)
+library(boot)
+library(table1)
+library(gridExtra)
+library(msm)
+library(knitr)
+library(survival)
+library(survminer)
+library(readxl)
+library(ggridges)
+library(ggalt)
+library(lubridate)
+library(scales)
+```
+
+```{r}
+df_slope1 <- as.data.frame(matrix(0, 6, 5))
+colnames(df_slope1) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope1$cancer <- c("esophagus", "kidney", "liver", "mesothelioma", "ovary", "pancreas")
+
+# make dataframe for slope plots
+# for each cancer type calculate the average survival time with and without early screening (early screening with effectiveness of 25% and 75%)
+# do this for every race and sex combo for 50-54 year olds
+df_slope1$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope1$survival2 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope1$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope1$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_mesothelioma$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
+
+df_slope2 <- as.data.frame(matrix(0, 5, 5))
+colnames(df_slope2) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope2$cancer <- c("esophagus", "kidney", "liver", "mesothelioma", "pancreas")
+
+df_slope2$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope2$survival2 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope2$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope2$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_mesothelioma$Lifetime[2], strategy_pancreas$Lifetime[2])
+
+df_slope3 <- as.data.frame(matrix(0, 4, 5))
+colnames(df_slope3) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope3$cancer <- c("kidney", "liver", "ovary", "pancreas")
+
+df_slope3$survival1 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope3$survival2 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope3$survival3 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope3$strategy <- c(strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
+
+df_slope4 <- as.data.frame(matrix(0, 3, 5))
+colnames(df_slope4) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope4$cancer <- c("kidney", "liver", "pancreas")
+
+df_slope4$survival1 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope4$survival2 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope4$survival3 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope4$strategy <- c(strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_pancreas$Lifetime[2])
+
+df_slope5 <- as.data.frame(matrix(0, 5, 5))
+colnames(df_slope5) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope5$cancer <- c("esophagus", "kidney", "liver", "ovary", "pancreas")
+
+df_slope5$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope5$survival2 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope5$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope5$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
+
+df_slope6 <- as.data.frame(matrix(0, 4, 5))
+colnames(df_slope6) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope6$cancer <- c("esophagus", "kidney", "liver", "pancreas")
+
+df_slope6$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope6$survival2 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope6$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope6$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_pancreas$Lifetime[2])
+
+df_slope7 <- as.data.frame(matrix(0, 4, 5))
+colnames(df_slope7) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope7$cancer <- c("kidney", "liver", "ovary", "pancreas")
+
+df_slope7$survival1 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope7$survival2 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope7$survival3 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope7$strategy <- c(strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
+
+df_slope8 <- as.data.frame(matrix(0, 4, 5))
+colnames(df_slope8) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope8$cancer <- c("esophagus", "kidney", "liver", "pancreas")
+
+df_slope8$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)))
+
+df_slope8$survival2 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_25)))
+
+df_slope8$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
+                  sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
+
+df_slope8$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_pancreas$Lifetime[2])
+```
+
+SLOPE PLOTS
+
+```{r, fig.width = 10}
+left_label <- df_slope1$cancer
+right_label1 <- paste(df_slope1$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope1$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope1) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12), 1.1*max(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of Caucasian Women, \n50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+
+left_label <- df_slope2$cancer
+right_label1 <- paste(df_slope2$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope2$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope2) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12), 1.1*max(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of Caucasian Men, \n50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+
+left_label <- df_slope3$cancer
+right_label1 <- paste(df_slope3$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope3$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope3) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12), 1.1*max(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of Hispanic Women, \n50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+
+left_label <- df_slope4$cancer
+right_label1 <- paste(df_slope4$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope4$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope4) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12), 1.1*max(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of Hispanic Men, \n50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+
+left_label <- df_slope5$cancer
+right_label1 <- paste(df_slope5$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope5$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12), 1.1*max(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of African American Women, \n50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+
+left_label <- df_slope6$cancer
+right_label1 <- paste(df_slope6$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope6$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope6) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12), 1.1*max(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of African American Men, \n50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+
+left_label <- df_slope7$cancer
+right_label1 <- paste(df_slope7$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope7$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope7) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12), 1.1*max(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of Asian or Pacific Islander \nWomen, 50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+
+left_label <- df_slope8$cancer
+right_label1 <- paste(df_slope8$cancer, "25% effectiveness", sep=", ")
+right_label2 <- paste(df_slope8$cancer, "75% effectiveness", sep=", ")
+lines <- c("75%" = "solid", "25%" = "dotted")
+
+ggplot(df_slope8) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival2/12, col=cancer, linetype = "25%"), size=3, show.legend=T, alpha = 0.5) + 
+  geom_segment(aes(x=1, xend=2, y=survival1/12, yend=survival3/12, col=cancer, linetype = "75%"), size=5, show.legend=T, alpha = 0.5) + 
+  geom_vline(xintercept=1, linetype="dashed", size=1) + 
+  geom_vline(xintercept=2, linetype="dashed", size=1) +
+  labs(x="Screening Status", y="Average Survival (Years)", color = "Cancer Type") +  
+  scale_x_continuous(limits = c(1, 2), breaks = c(1, 2), label = c("0", "1"))+
+  ylim(min(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12), 1.1*max(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12))+ 
+  geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12), hjust=-0.01, size=12)+ 
+  geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12), hjust=1.01, size=12)+
+  ggtitle("Overall Survival of Asian or Pacific Islander Men, \n50-54 from Different Cancers")+
+  scale_linetype_manual(name = "Effectiveness", values = lines)+
+  theme_classic()+ 
+  theme(panel.background = element_blank(), 
+        panel.grid = element_blank(),
+        axis.ticks = element_blank(),
+        panel.border = element_blank(),
+        plot.margin = unit(c(1,2,1,2), "cm"),
+        title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")+
+  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+```
+
+```{r}
+# summary statisitcs data table
+esophagus_data_survival$cancer <- "esophagus"
+kidney_data_survival$cancer <- "kidney"
+liver_data_survival$cancer <- "liver"
+mesothelioma_data_survival$cancer <- "mesothelioma"
+ovary_data_survival$cancer <- "ovary"
+pancreas_data_survival$cancer <- "pancreas"
+
+cancer_data_all <- rbind(esophagus_data_survival, rbind(kidney_data_survival, rbind(liver_data_survival, rbind(mesothelioma_data_survival, rbind(ovary_data_survival, pancreas_data_survival))))) 
+
+label(cancer_data_all$Age_Cat) <- "Age"
+label(cancer_data_all$Race_Origin) <- "Ancestry"
+label(cancer_data_all$new_survival) <- "Survival"
+units(cancer_data_all$new_survival) <- "months"
+
+cancer_data_all <- cancer_data_all %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+
+cancer_data_all$Age_Cat <- 
+  factor(cancer_data_all$Age_Cat,
+         labels=c("25-29", "30-34", "35-39", "40-44", "45-49", "50-54", "55-59", "60-64", "65-69", "70-74", "75-79", "80-84"))
+
+table1(~ Sex + Age_Cat + Race_Origin + new_survival | factor(cancer), data=cancer_data_all, topclass="Rtable1-zebra")
+```
+\
+
+VIOLIN PLOT
+
+```{r, fig.width = 10}
+#Violin plot of the survival densities for each early screening effectiveness level (0%, 50%, 100%) for each cancer type
+fills <- c("0%" = "red", "50%" = "yellow", "100%" = "blue")
+ggplot(cancer_data_all) + geom_violin(aes(cancer, new_survival/12, fill = "0%"), alpha = 0.5)+
+  geom_violin(aes(cancer, Survival_Months_Gained_screened_all_50/12, fill = "50%"), alpha = 0.5)+
+  geom_violin(aes(cancer, Survival_Months_Gained_screened_all_100/12, fill = "100%"), alpha = 0.5)+
+  scale_fill_manual(name = "Effectiveness:", values = fills, breaks=c("0%","50%", "100%"))+
+  theme_bw()+
+  labs(title="Violin Plot of Cancer Type Survival Distributions",
+       y = "Survival Time (Years)",
+       x = "Cancer Types") + 
+  theme(title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 28),
+        axis.text.x = element_text(size = 28),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")
+```
+
+LINE PLOT
+
+```{r, fig.width = 10}
+#line plots for all cancer types
+plot_data_esophagus75 <- plot_data_esophagus75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot(plot_data_esophagus75, aes(x=age, y = estimate/12, color=race))+
+  geom_line(aes(group=race), size = 2, alpha = 0.75)+
+  geom_point(aes(size=sample_size), alpha = 0.5)+
+  scale_size(name = "Sample Size", range = c(5, 20))+
+  scale_color_manual(name = "Ancestry", values=c("#009E73", "#56B4E9", "#F0E442", "#E69F00", "#0072B2", "#D55E00", "#CC79A7"))+
+  facet_wrap(~sex)+
+  ylab("Expected Residual Lifetime Gained (Years)")+
+  xlab("Age")+
+  ggtitle("Esophageal Cancer")+
+  theme_light()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.title.y = element_text(hjust = 0.5),
+        strip.text = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        title = element_text(size = 28))+
+  guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
+
+plot_data_kidney75 <- plot_data_kidney75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot(plot_data_kidney75, aes(x=age, y = estimate/12, color=race))+
+  geom_line(aes(group=race), size = 2, alpha = 0.75)+
+  geom_point(aes(size=sample_size), alpha = 0.5)+
+  scale_size(name = "Sample Size", range = c(5, 20))+
+  scale_color_manual(name = "Ancestry", values=c("#009E73", "#56B4E9", "#F0E442", "#E69F00", "#0072B2", "#D55E00", "#CC79A7"))+
+  facet_wrap(~sex)+
+  ylab("Expected Residual Lifetime Gained (Years)")+
+  xlab("Age")+
+  ggtitle("Kidney Cancer")+
+  theme_light()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.title.y = element_text(hjust = 0.5),
+        strip.text = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        title = element_text(size = 28))+
+  guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
+
+plot_data_liver75 <- plot_data_liver75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot(plot_data_liver75, aes(x=age, y = estimate/12, color=race))+
+  geom_line(aes(group=race), size = 2, alpha = 0.75)+
+  geom_point(aes(size=sample_size), alpha = 0.5)+
+  scale_size(name = "Sample Size", range = c(5, 20))+
+  scale_color_manual(name = "Ancestry", values=c("#009E73", "#56B4E9", "#F0E442", "#E69F00", "#0072B2", "#D55E00", "#CC79A7"))+
+  facet_wrap(~sex)+
+  ylab("Expected Residual Lifetime Gained (Years)")+
+  xlab("Age")+
+  ggtitle("Liver Cancer")+
+  theme_light()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.title.y = element_text(hjust = 0.5),
+        strip.text = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        title = element_text(size = 28))+
+  guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
+
+plot_data_mesothelioma75 <- plot_data_mesothelioma75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot(plot_data_mesothelioma75, aes(x=age, y = estimate/12, color=race))+
+  geom_line(aes(group=race), size = 2, alpha = 0.75)+
+  geom_point(aes(size=sample_size), alpha = 0.5)+
+  scale_size(name = "Sample Size", range = c(5, 20))+
+  scale_color_manual(name = "Ancestry", values=c("#F0E442", "#E69F00", "#009E73", "#56B4E9", "#0072B2", "#D55E00", "#CC79A7"))+
+  facet_wrap(~sex)+
+  ylab("Expected Residual Lifetime Gained (Years)")+
+  xlab("Age")+
+  ggtitle("Mesothelioma Cancer")+
+  theme_light()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.title.y = element_text(hjust = 0.5),
+        strip.text = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        title = element_text(size = 28))+
+  guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
+
+plot_data_ovary75 <- plot_data_ovary75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot(plot_data_ovary75, aes(x=age, y = estimate/12, color=race))+
+  geom_line(aes(group=race), size = 2, alpha = 0.75)+
+  geom_point(aes(size=sample_size), alpha = 0.5)+
+  scale_size(name = "Sample Size", range = c(5, 20))+
+  scale_color_manual(name = "Ancestry", values=c("#009E73", "#56B4E9", "#F0E442", "#E69F00", "#0072B2", "#D55E00", "#CC79A7"))+
+  facet_wrap(~sex)+
+  ylab("Expected Residual Lifetime Gained (Years)")+
+  xlab("Age")+
+   ggtitle("Ovarian Cancer")+
+  theme_light()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.title.y = element_text(hjust = 0.5),
+        strip.text = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        title = element_text(size = 28))+
+  guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
+```
+
+RIDGE PLOT
+
+```{r, fig.width = 10}
+# Ridge plots for all cancer types
+colors <- c("Unscreened" = "red", "Screened (25% Effectiveness)" = "orange", "Screened (50% Effectiveness)" = "yellow", "Screened (75% Effectiveness)" = "green", "Screened (100% Effectiveness)" = "blue")
+ridge_data <- esophagus_data_survival %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot()+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = new_survival/12, fill = "Unscreened"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_25/12, fill = "Screened (25% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_50/12, fill = "Screened (50% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_75/12, fill = "Screened (75% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_100/12, fill = "Screened (100% Effectiveness)"), alpha = 0.5, scale = 1)+
+  facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
+  xlab("Survival (Years)")+
+  ylab("Age")+
+  ggtitle("Esophageal Cancer")+
+  labs(fill = "Screening Status:")+
+  scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )+
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+ridge_data <- kidney_data_survival %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot()+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = new_survival/12, fill = "Unscreened"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_25/12, fill = "Screened (25% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_50/12, fill = "Screened (50% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_75/12, fill = "Screened (75% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_100/12, fill = "Screened (100% Effectiveness)"), alpha = 0.5, scale = 1)+
+  facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
+  xlab("Survival (Years)")+
+  ylab("Age")+
+  ggtitle("Kidney Cancer")+
+  labs(fill = "Screening Status:")+
+  scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )+
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+ridge_data <- liver_data_survival %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot()+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = new_survival/12, fill = "Unscreened"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_25/12, fill = "Screened (25% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_50/12, fill = "Screened (50% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_75/12, fill = "Screened (75% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_100/12, fill = "Screened (100% Effectiveness)"), alpha = 0.5, scale = 1)+
+  facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
+  xlab("Survival (Years)")+
+  ylab("Age")+
+  ggtitle("Liver Cancer")+
+  labs(fill = "Screening Status:")+
+  scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )+
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+ridge_data <- mesothelioma_data_survival %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot()+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = new_survival/12, fill = "Unscreened"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_25/12, fill = "Screened (25% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_50/12, fill = "Screened (50% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_75/12, fill = "Screened (75% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_100/12, fill = "Screened (100% Effectiveness)"), alpha = 0.5, scale = 1)+
+  facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
+  xlab("Survival (Years)")+
+  ylab("Age")+
+  ggtitle("Mesothelioma Cancer")+
+  labs(fill = "Screening Status:")+
+  scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )+
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+ridge_data <- ovary_data_survival %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot()+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = new_survival/12, fill = "Unscreened"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_25/12, fill = "Screened (25% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_50/12, fill = "Screened (50% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_75/12, fill = "Screened (75% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_100/12, fill = "Screened (100% Effectiveness)"), alpha = 0.5, scale = 1)+
+  facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
+  xlab("Survival (Years)")+
+  ylab("Age")+
+  ggtitle("Ovarian Cancer")+
+  labs(fill = "Screening Status:")+
+  scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )+
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+ridge_data <- pancreas_data_survival %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot()+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = new_survival/12, fill = "Unscreened"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_25/12, fill = "Screened (25% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_50/12, fill = "Screened (50% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_75/12, fill = "Screened (75% Effectiveness)"), alpha = 0.5, scale = 1)+
+  geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_100/12, fill = "Screened (100% Effectiveness)"), alpha = 0.5, scale = 1)+
+  facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
+  xlab("Survival (Years)")+
+  ylab("Age")+
+  ggtitle("Pancreatic Cancer")+
+  labs(fill = "Screening Status:")+
+  scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )+
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+```
+
+DUMBBELL
+
+```{r, fig.width = 10}
+#Dumbbell plots for all cancer types
+esophagus_dumbbell <- esophagus_data_survival %>% group_by(Race_Origin, Sex, Age_Cat) %>% summarise(mean0 = mean(new_survival), mean100 = mean(Survival_Months_Gained_screened_all_100))
+
+kidney_dumbbell <- kidney_data_survival %>% group_by(Race_Origin, Sex, Age_Cat) %>% summarise(mean0 = mean(new_survival), mean100 = mean(Survival_Months_Gained_screened_all_100))
+
+liver_dumbbell <- liver_data_survival %>% group_by(Race_Origin, Sex, Age_Cat) %>% summarise(mean0 = mean(new_survival), mean100 = mean(Survival_Months_Gained_screened_all_100))
+
+mesothelioma_dumbbell <- mesothelioma_data_survival %>% group_by(Race_Origin, Sex, Age_Cat) %>% summarise(mean0 = mean(new_survival), mean100 = mean(Survival_Months_Gained_screened_all_100))
+
+ovary_dumbbell <- ovary_data_survival %>% group_by(Race_Origin, Sex, Age_Cat) %>% summarise(mean0 = mean(new_survival), mean100 = mean(Survival_Months_Gained_screened_all_100))
+
+pancreas_dumbbell <- pancreas_data_survival %>% group_by(Race_Origin, Sex, Age_Cat) %>% summarise(mean0 = mean(new_survival), mean100 = mean(Survival_Months_Gained_screened_all_100))
+
+ggplot(esophagus_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE), aes(x=mean0/12, xend=mean100/12, y=Age_Cat, group=Age_Cat)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=2, 
+                      size_x=5,
+                      size_xend=5,
+                      colour_xend ="#0e668b")+
+  xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
+  ylab("Age Categories")+
+  ggtitle("Esophageal Cancer")+
+  facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )
+
+ggplot(kidney_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE), aes(x=mean0/12, xend=mean100/12, y=Age_Cat, group=Age_Cat)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=2, 
+                      size_x=5,
+                      size_xend=5,
+                      colour_xend ="#0e668b")+
+  xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
+  ylab("Age Categories")+
+  ggtitle("Kidney Cancer")+
+  facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )
+
+ggplot(liver_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE), aes(x=mean0/12, xend=mean100/12, y=Age_Cat, group=Age_Cat)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=2, 
+                      size_x=5,
+                      size_xend=5,
+                      colour_xend ="#0e668b")+
+  xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
+  ylab("Age Categories")+
+  ggtitle("Liver Cancer")+
+  facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )
+
+ggplot(mesothelioma_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE), aes(x=mean0/12, xend=mean100/12, y=Age_Cat, group=Age_Cat)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=2, 
+                      size_x=5,
+                      size_xend=5,
+                      colour_xend ="#0e668b")+
+  xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
+  ylab("Age Categories")+
+  ggtitle("Mesothelioma Cancer")+
+  facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )
+
+ggplot(ovary_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE), aes(x=mean0/12, xend=mean100/12, y=Age_Cat, group=Age_Cat)) +  
+        geom_dumbbell(color="#a3c4dc", 
+                      size=2, 
+                      size_x=5,
+                      size_xend=5,
+                      colour_xend ="#0e668b")+
+  xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
+  ylab("Age Categories")+
+  ggtitle("Ovarian Cancer")+
+  facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )
+
+ggplot(pancreas_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE), aes(x=mean0/12, xend=mean100/12, y=Age_Cat, group=Age_Cat)) + 
+        geom_dumbbell(color="#a3c4dc", 
+                      size=2, 
+                      size_x=5,
+                      size_xend=5,
+                      colour_xend ="#0e668b")+
+  xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
+  ylab("Age Categories")+
+  ggtitle("Pancreatic Cancer")+
+  facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
+  theme_light()+
+  theme(title = element_text(size = 32),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text(size = 28),
+        axis.title.y = element_text(size = 28, hjust = 0.5),
+        strip.text = element_text(size = 26),
+        legend.position = "bottom",
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        )
+```
+
