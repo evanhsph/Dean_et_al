@@ -2,7 +2,7 @@
 
 ## Data Scientist: Evan Goldberg
 ## First Author: Justin Dean
-## Senior authors: Franziska Michor
+## Senior Authors: Franziska Michor
 
 # Description
 
