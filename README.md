@@ -17,7 +17,7 @@ First perform a case listing with the following dataset: "Incidence - SEER 18 Re
 The following selections were made to subset the data in the selection tab\
 -Age recode with <1 year olds not equal to unknown\
 -Age at diagnosis not equal to unknown\
--Site and Morphology Site = Pancreas (or whatever desired cancer type)\
+-Site and Morphology Site = Pancreas (*or whatever the desired cancer type is*)
 
 The following variables were selected for the dataset in the table tab\
 -Patient ID\
@@ -29,14 +29,14 @@ The following variables were selected for the dataset in the table tab\
 -Age at diagnosis\
 -Month of diagnosis\
 -Chemotherapy recode (yes, no/unknown)\
--Radiation Sequence with surgery
--Type of follow-up expected
--Reason no cancer-directed surgery
--COD to site recode
--SEER cause-specific death classification
--SEER other cause of death classification
--Survival months
--Survival months flag
--Vital status recode (study cutoff used)
--Sequence number
+-Radiation Sequence with surgery\
+-Type of follow-up expected\
+-Reason no cancer-directed surgery\
+-COD to site recode\
+-SEER cause-specific death classification\
+-SEER other cause of death classification\
+-Survival months\
+-Survival months flag\
+-Vital status recode (study cutoff used)\
+-Sequence number\
 -First malignant primary indicator
