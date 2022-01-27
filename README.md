@@ -8,7 +8,9 @@
 
 This project looks at SEER data and applies queuing network model theory to assess the benefits of hypothetical early screening methods.
 
-All the code used for this project can be found in Code/.
+All the code used for this project can be found in Code./
+-Project_Pancreas includes code about the model, including calculating estimates, checking model assumptions, and creating plots for pancreas cancer./
+-Project_Cancer combines data calculated from Project_Pancreas, as well as identical codes for kidney, liver, mesothelioma, and ovarian cancers to create comparison plots and tables.
 
 Data can be accessed by completing the following steps after getting access to the SEER database using the SEERstat software and getting special access to the chemotherapy dataset.
 
