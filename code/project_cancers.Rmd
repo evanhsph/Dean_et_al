@@ -1,5 +1,6 @@
 ```{r}
-load("project_cancer.RData")
+#Load libraries (note: not all may be used for final version)
+#load("project_cancer.RData") #this is data from all cancer scripts run combined
 library(dplyr)
 library(ggplot2)
 library(plot3D)
