@@ -600,7 +600,7 @@ ggplot(plot_data_mesothelioma75, aes(x=age, y = estimate/12, color=race))+
   facet_wrap(~sex)+
   ylab("Expected Residual Lifetime Gained (Years)")+
   xlab("Age")+
-  ggtitle("Mesothelioma Cancer")+
+  ggtitle("Mesothelioma")+
   theme_light()+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
         axis.text.y = element_text(size = 28),
@@ -727,7 +727,7 @@ ggplot()+
   facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
   xlab("Survival (Years)")+
   ylab("Age")+
-  ggtitle("Mesothelioma Cancer")+
+  ggtitle("Mesothelioma")+
   labs(fill = "Screening Status:")+
   scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
   theme_light()+
@@ -886,7 +886,7 @@ ggplot(mesothelioma_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years"
                       colour_xend ="#0e668b")+
   xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
   ylab("Age Categories")+
-  ggtitle("Mesothelioma Cancer")+
+  ggtitle("Mesothelioma")+
   facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
   theme_light()+
   theme(title = element_text(size = 32),
