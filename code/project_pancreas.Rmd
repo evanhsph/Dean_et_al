@@ -1242,13 +1242,13 @@ ggsurvplot(fit_pancreas, data = pancreas_data_survival, combine = TRUE, # Combin
            palette = c("red", "orange", "yellow", "green", "blue"),
            ggtheme = theme_light(),
            size = 2,
-           legend = "bottom",
+           legend = c(0.8, 0.8),
            legend.title="Screening Status:",
            legend.lab=c("Unscreened", "Screened (25% Effectiveness)", "Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"),
            font.x = c(28),
            font.y = c(28),
            font.tickslab = c(28),
-           font.legend = c(16),
+           font.legend = c(28),
            xlab = "Years", 
            ylab = "Survival Probability"#,
            )
@@ -1294,11 +1294,8 @@ ggplot(pancreas_data_survival %>% filter(Race_Origin == "Hispanic", Sex == "Fema
   xlab("Overall Survival With and Without Screening in Years")+
   ylab("Age")+
   ggtitle("Hispanic Women")+
-  #ggtitle("Life Years Gained from Screening")+
-  #facet_wrap(~Race_Origin+Sex)+
-  #facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 20),
+  theme(axis.text.x = element_text(, vjust = 0.5, hjust=1, size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text( size = 28),
         axis.title.y = element_text(hjust = 0.5),
@@ -1478,10 +1475,10 @@ ggplot(as.data.frame(df_pancreas2), aes(x = V1, y = V2, fill = V3/12))+
   #ggtitle("Expected Residual Lifetime Gained Based on Detection Probability and Early Treatment Effectiveness")+
   ggtitle("Caucasian Women, 50-54")+
   theme_light()+
-  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 20),
+  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
         strip.text = element_text(size = 20),
-        axis.title = element_text( size = 20),
-        axis.text.y = element_text(size = 20),
+        axis.title = element_text( size = 28),
+        axis.text.y = element_text(size = 24),
         axis.title.x = element_text(vjust = -0.5),
         axis.title.y = element_text(hjust = 0.5),
         legend.text = element_text(size = 16),
