@@ -239,7 +239,7 @@ ggplot(df_slope1) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 
@@ -272,7 +272,7 @@ ggplot(df_slope2) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 
@@ -305,7 +305,7 @@ ggplot(df_slope3) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 
@@ -338,7 +338,7 @@ ggplot(df_slope4) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 
@@ -371,7 +371,7 @@ ggplot(df_slope5) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 
@@ -404,7 +404,7 @@ ggplot(df_slope6) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 
@@ -437,7 +437,7 @@ ggplot(df_slope7) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 
@@ -470,7 +470,7 @@ ggplot(df_slope8) +
         axis.text.y = element_text(size = 28),
         axis.text.x = element_text(size = 28),
         legend.title = element_text(size = 32),
-        legend.text = element_text(size = 32),
+        legend.text = element_text(size = 24),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
 ```
@@ -528,6 +528,27 @@ LINE PLOT
 
 ```{r, fig.width = 10}
 #line plots for all cancer types
+plot_data_pancreas75 <- plot_data_pancreas75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
+ggplot(plot_data_pancreas75, aes(x=age, y = estimate/12, color=race))+
+  geom_line(aes(group=race), size = 2, alpha = 0.75)+
+  geom_point(aes(size=sample_size), alpha = 0.5)+
+  scale_size(name = "Sample Size", range = c(5, 20))+
+  scale_color_manual(name = "Ancestry", values=c("#009E73", "#56B4E9", "#F0E442", "#E69F00", "#0072B2", "#D55E00", "#CC79A7"))+
+  facet_wrap(~sex)+
+  ylab("Expected Residual Lifetime Gained (Years)")+
+  xlab("Age")+
+  ggtitle("Pancreatic Cancer")+
+  theme_light()+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
+        axis.text.y = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.title.y = element_text(hjust = 0.5),
+        strip.text = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        title = element_text(size = 28))+
+  guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
+
 plot_data_esophagus75 <- plot_data_esophagus75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
 ggplot(plot_data_esophagus75, aes(x=age, y = estimate/12, color=race))+
   geom_line(aes(group=race), size = 2, alpha = 0.75)+
@@ -717,6 +738,7 @@ ggplot()+
         )+
   guides(fill=guide_legend(nrow=3,byrow=TRUE))
 
+#have to do mesothelioma slightly different since it has a missing panel
 ridge_data <- mesothelioma_data_survival %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
 ggplot()+
   geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = new_survival/12, fill = "Unscreened"), alpha = 0.5, scale = 1)+
@@ -724,7 +746,7 @@ ggplot()+
   geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_50/12, fill = "Screened (50% Effectiveness)"), alpha = 0.5, scale = 1)+
   geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_75/12, fill = "Screened (75% Effectiveness)"), alpha = 0.5, scale = 1)+
   geom_density_ridges(data = ridge_data, aes(y = Age_Cat, x = Survival_Months_Gained_screened_all_100/12, fill = "Screened (100% Effectiveness)"), alpha = 0.5, scale = 1)+
-  facet_grid(cols = vars(Race_Origin), rows = vars(Sex))+
+  facet_wrap(~Race_Origin+Sex)+
   xlab("Survival (Years)")+
   ylab("Age")+
   ggtitle("Mesothelioma")+
@@ -878,6 +900,7 @@ ggplot(liver_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-0
         legend.title = element_text(size = 32),
         )
 
+#have to do mesothelioma slightly different since it has a missing panel
 ggplot(mesothelioma_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE), aes(x=mean0/12, xend=mean100/12, y=Age_Cat, group=Age_Cat)) + 
         geom_dumbbell(color="#a3c4dc", 
                       size=2, 
@@ -887,7 +910,7 @@ ggplot(mesothelioma_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years"
   xlab("Overall Survival With and Without 100% Effective Screening (Years)")+
   ylab("Age Categories")+
   ggtitle("Mesothelioma")+
-  facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
+  facet_grid(~Race_Origin+Sex)+
   theme_light()+
   theme(title = element_text(size = 32),
         axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
