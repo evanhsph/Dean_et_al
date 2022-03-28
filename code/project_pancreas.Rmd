@@ -1332,7 +1332,7 @@ SOURCE FOR CATEGORY POPULATION DATA
 https://www.census.gov/data/tables/time-series/demo/popest/2010s-national-detail.html
 Annual Estimates of the Resident Population for Selected Age Groups by Sex: April 1, 2010 to July 1, 2019
 
-Stategy plot
+Stategy plot (This is old and is replaced with a new version below)
 
 ```{r}
 strategy_pancreas2 <- as.data.frame(matrix(0, 9, 2))
@@ -1385,16 +1385,61 @@ ggplot(strategy_pancreas2)+
         title = element_text(size = 28))
 ```
 
+Updated strategy plot
+
+```{r}
+strategy_pancreas3 <- pancreas_data_survival[,c("Age_Cat", "Sex", "Race_Origin", "Year_Diagnosis", "estimate_screened_all_75")] %>% filter(Year_Diagnosis == 2010)
+
+#take the expected lifetime, multiply it by the number of people with pancreas cancer divided by the population of the united states for a given age and race category
+strategy_pancreas3$age55 <- ifelse(strategy_pancreas3$Age_Cat < 55, "Under 55", "55+")
+strategy_pancreas3$population <-  ifelse(strategy_pancreas3$Race_Origin == "Hispanic" & strategy_pancreas3$age55 == "55+", 5724831,
+                                  ifelse(strategy_pancreas3$Race_Origin == "Hispanic" & strategy_pancreas3$age55 == "Under 55", 16886751,
+                                  ifelse(strategy_pancreas3$Race_Origin == "Caucasian" & strategy_pancreas3$age55 == "55+", 54891829,
+                                  ifelse(strategy_pancreas3$Race_Origin == "Caucasian" & strategy_pancreas3$age55 == "Under 55", 68000019,
+                                  ifelse(strategy_pancreas3$Race_Origin == "African American" & strategy_pancreas3$age55 == "55+", 6843792,
+                                  ifelse(strategy_pancreas3$Race_Origin == "African American" & strategy_pancreas3$age55 == "Under 55", 13145040,
+                                  ifelse(strategy_pancreas3$Race_Origin == "Asian or Pacific Islander" & strategy_pancreas3$age55 == "55+",
+                                  2861883, 5929757)))))))
+for(i in 1:nrow(strategy_pancreas3))
+{
+  strategy_pancreas3$numb[i] <- nrow(strategy_pancreas3 %>% filter(Race_Origin == strategy_pancreas3$Race_Origin[i]) %>% filter(age55 == strategy_pancreas3$age55[i]))
+}
+strategy_pancreas3$estimate_dist<-strategy_pancreas3$estimate_screened_all_75*strategy_pancreas3$numb/strategy_pancreas3$population
+strategy_pancreas3$group <- paste(strategy_pancreas3$Race_Origin, strategy_pancreas3$age55)
+```
+
+```{r, fig.width = 10}
+ggplot(strategy_pancreas3, aes(group, estimate_dist/12*365, fill = Race_Origin)) + geom_violin(size = 1, scale = "width", trim = FALSE)+ geom_boxplot(width = 0.1, fill = "white")+facet_wrap(~age55, scale = "free")+
+  labs(y = "Survival Time Per Screen (Days)",
+       x = "Early Screening Strategy",
+       fill='Ancestry',
+       linetype = "Age Category") + 
+  # scale_linetype_manual(values = c("dotted", "solid"))+
+  # scale_size_manual(values = c(2, 0.5), guide = "none")+
+  scale_fill_manual(values=c("#009E73", "#56B4E9", "#F0E442", "#E69F00", "#0072B2", "#D55E00", "#CC79A7"))+
+    theme_light()+
+  theme(title = element_text(size = 48),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 24),
+        axis.text.x = element_blank(),
+        legend.title = element_text(size = 28),
+        # legend.title = element_blank(),
+        legend.text = element_text(size = 24),
+        legend.position = "bottom",
+        strip.text = element_text(size = 28))
+```
+
 HEAT MAP
 
 ```{r}
 #Create a dataset and synthetic data like before but now we have two scales, effectiveness and detection probability. Effectiveness is the likelihood that the treatment after early screening will succeed and provide normal life expectancy. Detection probability is the likelihood that early detection will occur. Otherwise the process is the same as above.
 
-df_pancreas2 <- matrix(0, length(seq(0, 1, by = 0.1))*length(seq(0, 1, by = 0.1)), 3)
+df_pancreas2 <- matrix(0, length(seq(0, 1, by = 0.01))*length(seq(0, 1, by = 0.01)), 3)
 t <- 1
-for(x in seq(0, 1, by = 0.1))
+for(x in seq(0, 1, by = 0.01))
 {
-  for(a in seq(0, 1, by = 0.1))
+  for(a in seq(0, 1, by = 0.01))
   {
     data_filtered <- df_pancreas %>% filter(Race_Origin == "Caucasian") %>% filter(Age_Cat == "50-54 years") %>% filter(Sex == "Female")
     
@@ -1475,16 +1520,20 @@ ggplot(as.data.frame(df_pancreas2), aes(x = V1, y = V2, fill = V3/12))+
   #ggtitle("Expected Residual Lifetime Gained Based on Detection Probability and Early Treatment Effectiveness")+
   ggtitle("Caucasian Women, 50-54")+
   theme_light()+
+  scale_fill_distiller(palette = "RdPu")+
+  scale_x_continuous(expand = c(0,0), breaks = seq(0, 1, by = 0.25))+
+  scale_y_continuous(expand = c(0,0), breaks = seq(0.25, 1, by = 0.25))+
   theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
         strip.text = element_text(size = 20),
         axis.title = element_text( size = 28),
         axis.text.y = element_text(size = 24),
         axis.title.x = element_text(vjust = -0.5),
         axis.title.y = element_text(hjust = 0.5),
-        legend.text = element_text(size = 16),
-        legend.title = element_text(size = 20),
-        title = element_text(size = 28))+
-  labs(fill='Expected Residual Lifetime Gained (Years)') 
+        legend.text = element_text(size = 24),
+        legend.title = element_text(size = 24),
+        title = element_text(size = 28),
+        legend.key.height = unit(2.5, "cm"))+
+  labs(fill='Expected Residual\nLifetime Gained\n(Years)') 
 ```
 
 CONTOUR PLOT
@@ -1573,21 +1622,22 @@ ggplot(as.data.frame(df_pancreas3))+
   geom_smooth(aes(x = V2, y = V3/12, group = V1, color = V1))+
   xlab("Probability of Early Detection")+
   ylab("Expected Residual Lifetime Gained (Years)")+
-  labs(color = "Treatment Effectiveness")+
+  labs(color = "Treatment\nEffectiveness")+
   scale_colour_gradient(
   low = "red",
-  high = "blue"
+  high = "blue", breaks = seq(0, 0.75, by = 0.25)
 )+
   theme_light()+
   ggtitle("African American Men, 65-69")+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
+  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
         axis.text.y = element_text(size = 28),
         axis.title = element_text( size = 28),
         axis.title.y = element_text(hjust = 0.5),
         strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
+        legend.text = element_text(size = 24),
         legend.title = element_text(size = 28),
-        title = element_text(size = 28))
+        title = element_text(size = 28),
+        legend.key.height = unit(2.5, "cm"))
 ```
 
 INCIDENCE PLOT
@@ -1720,41 +1770,110 @@ SPECIFICITY
 
 ```{r}
 #Visualize how a change in specificity would affect the estimate
-
-# a. Average # of white males 55-59 8366815
-# b. Number of people in that group with pancreatic cancer: multiply seer # by 5 (seer has a fifth of the data)
-# 365*5 = 1825
-# c. Pick a number that is the expected lifetime of a false positive (lose 3% (arbitrary/parameter of model) of life expectancy of that group)
-# d. Range of false pos probs (0.0 to 0.001)
-# e. Change first term of estimate to ((1/(m10+m12)+m12/(m3*(m10+m12))) - (1/(m10+m12)+m12/(m2*(m10+m12))))*1825 - lifetime lost from false positives
-# f. lifetime lost from false positives = (a-b)*d*c*expected residual lifetime
-# expected lifetime = 76.1, residual = 76.1 - 52.5 = 23.6
-
-df_pancreas4 <- matrix(0, length(seq(0, 0.1, by = 0.01)), 2)
-x_i <- 1
-for(i in seq(0, 0.001, by = 0.0001))
+df_pancreas4 <- matrix(0, length(seq(0, 1, by = 0.01))*length(seq(0, 0.001, by = 0.0001)), 4)
+t <- 1
+for(x in seq(0, 0.001, by = 0.0001))
 {
-  df_pancreas4[x_i, 1] <- i
-  df_pancreas4[x_i, 2] <- 141.96129*1825 - (8366815-1825)*i*0.03*23.6*12 # 23.6 = 76.1 - average of 55-59
-  x_i <- x_i + 1
+  for(a in seq(0, 1, by = 0.01))
+  {
+    data_filtered <- df_pancreas %>% filter(Race_Origin == "Caucasian") %>% filter(Age_Cat == "55-59 years") %>% filter(Sex == "Male")
+    
+    data_filtered$new_survival_early <- data_filtered$new_survival
+    for(e in 1:nrow(data_filtered))
+    {
+      u1 <- runif(1, 0, 1)
+      if(u1 <= a)
+      {
+        if(data_filtered$new_survival[e] <= (76.1*12 - data_filtered$Age_Diagnosis[e]*12))
+        {
+          data_filtered$new_survival_early[e] <- 76.1*12 - data_filtered$Age_Diagnosis[e]*12
+        }
+      }
+    }
+    
+    sample_size <- nrow(data_filtered)
+    
+    diagnosis <- data_filtered %>% 
+      count(Year_Diagnosis)
+    
+    for(y in years)
+    {
+      if(is.element(y, diagnosis$Year_Diagnosis)==FALSE)
+      {
+        diagnosis <- rbind(diagnosis, c(y, 0))
+        colnames(diagnosis)<-c("Year_Diagnosis", "n")
+      }
+    }
+    
+    diagnosis <- diagnosis[order(diagnosis$Year_Diagnosis),] 
+    
+    h <- mean(diagnosis$n)
+    
+    m2 <- 1/(mean(data_filtered$new_survival, na.rm = TRUE))
+    
+    if(is.nan(m2) ==TRUE | is.na(m2)==TRUE)
+    {
+      m2 <- 0
+    }
+    
+    m3 <- 1/(mean(data_filtered$new_survival_early, na.rm = TRUE))
+    
+    if(is.nan(m3) ==TRUE | is.na(m3)==TRUE)
+    {
+      m3 <- 0
+    }
+    
+    m1 <- 1/6
+    
+    r12 <- 0.9
+    r10 <- 1 - r12
+    
+    m10 <- r10*m1
+    m12 <- r12*m1
+    
+    survival_time <- mean(data_filtered$Survival_Months)
+    
+    estimate <- (1/(m10+m12)+m12/(m3*(m10+m12))) -  (1/(m10+m12)+m12/(m2*(m10+m12)))
+    
+    # a. Average # of white males 55-59 8366815 (average census population size from 2010-2016)
+    # b. Number of people in that group with pancreatic cancer: multiply seer # by 5 (seer has a fifth of the data)
+    # 365*5 = 1825
+    # c. Pick a number that is the expected lifetime of a false positive (lose 3% (arbitrary/parameter of model) of life expectancy of that group)
+    # d. Range of false pos probs (0.0 to 0.001)
+    # e. Change first term of estimate to ((1/(m10+m12)+m12/(m3*(m10+m12))) - (1/(m10+m12)+m12/(m2*(m10+m12))))*1825 - lifetime lost from false positives
+    # f. lifetime lost from false positives = (a-b)*d*c*expected residual lifetime
+    # expected lifetime = 76.1, residual = 76.1 - 52.5 = 23.6
+    
+    df_pancreas4[t, 1] <- x
+    df_pancreas4[t, 2] <- a
+    df_pancreas4[t, 3] <- estimate
+    df_pancreas4[t, 4] <- estimate*1825 - (8366815-1825)*x*0.03*23.6*12 # 23.6 = 76.1 - average of 55-59
+    t <- t + 1
+  }
 }
-specificity_data <- as.data.frame(df_pancreas4)
 ```
 
-```{r, fig.width = 8}
-ggplot(specificity_data)+
-  geom_col(aes(V1*100, V2/8366815*30, fill = V2/8366815*30), color = "black")+
-  ylab("Average Net Survival Benefit Per Screen (Days)")+
+```{r, fig.width = 10}
+ggplot(as.data.frame(df_pancreas4), aes(x = V1*100, y = V2, fill = V4/8366815*30))+
+  geom_tile()+
   xlab("False Positive Probability")+
+  ylab("Treatment Effectiveness")+
   ggtitle("Caucasian Men, 55-59")+
   theme_light()+
-    theme(axis.text.x = element_text(size = 28),
-        axis.text.y = element_text(size = 28),
+  scale_fill_distiller(palette = "OrRd")+
+  scale_x_continuous(expand = c(0,0), breaks = seq(0, 0.1, by = 0.025))+
+  scale_y_continuous(expand = c(0,0), breaks = seq(0.25, 1, by = 0.25))+
+  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
+        strip.text = element_text(size = 20),
         axis.title = element_text( size = 28),
+        axis.text.y = element_text(size = 24),
+        axis.title.x = element_text(vjust = -0.5),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.position = "none",
-        title = element_text(size = 28))
+        legend.text = element_text(size = 24),
+        legend.title = element_text(size = 24),
+        title = element_text(size = 28),
+        legend.key.height = unit(2.5, "cm"))+
+  labs(fill="Average Net Survival\nBenefit Per Screen\n(Days)") 
 ```
 
 MORTALITY
@@ -1769,103 +1888,113 @@ MORTALITY
   ### bar plot (one subgroup)
   ### p = 0.01, 0.02 , ... , 0.1 
 
-df_pancreas5 <- matrix(0, length(seq(0, 0.001, by = 0.0001)), 5)
+df_pancreas5 <- matrix(0, length(seq(0, 0.001, by = 0.00001))*length(seq(0, 1, by = 0.01)), 6)
 x_i <- 1
-for(p in seq(0, 0.001, by = 0.0001)) #probability of treatment induced mortality (mortality = 1 month)
+for(p in seq(0, 0.001, by = 0.00001)) #probability of treatment induced mortality (mortality = 1 month)
 {
-  data_filtered <- df_pancreas %>% filter(Race_Origin == "African American") %>% filter(Age_Cat == "55-59 years") %>% filter(Sex == "Female")
-  
-  data_filtered$new_survival_early <- data_filtered$new_survival
-  set.seed(123)
-  for(e in 1:nrow(data_filtered))
+  for(a in seq(0, 1, by = 0.01))
   {
-    u1 <- runif(1, 0, 1)
-    u2 <- runif(1, 0, 1)
-    if(u1 <= 0.75)
+    data_filtered <- df_pancreas %>% filter(Race_Origin == "African American") %>% filter(Age_Cat == "55-59 years") %>% filter(Sex == "Female")
+    
+    data_filtered$new_survival_early <- data_filtered$new_survival
+    set.seed(123)
+    for(e in 1:nrow(data_filtered))
     {
-      if(data_filtered$new_survival[e] <= (77.9*12 - data_filtered$Age_Diagnosis[e]*12))
+      u1 <- runif(1, 0, 1)
+      if(u1 <= a)
       {
-        data_filtered$new_survival_early[e] <- 77.9*12 - data_filtered$Age_Diagnosis[e]*12
+        if(data_filtered$new_survival[e] <= (77.9*12 - data_filtered$Age_Diagnosis[e]*12))
+        {
+          data_filtered$new_survival_early[e] <- 77.9*12 - data_filtered$Age_Diagnosis[e]*12
+        }
       }
     }
-  }
-  
-  sample_size <- nrow(data_filtered)
-  
-  diagnosis <- data_filtered %>% 
-    count(Year_Diagnosis)
-  
-  for(y in years)
-  {
-    if(is.element(y, diagnosis$Year_Diagnosis)==FALSE)
+    
+    sample_size <- nrow(data_filtered)
+    
+    diagnosis <- data_filtered %>% 
+      count(Year_Diagnosis)
+    
+    for(y in years)
     {
-      diagnosis <- rbind(diagnosis, c(y, 0))
-      colnames(diagnosis)<-c("Year_Diagnosis", "n")
+      if(is.element(y, diagnosis$Year_Diagnosis)==FALSE)
+      {
+        diagnosis <- rbind(diagnosis, c(y, 0))
+        colnames(diagnosis)<-c("Year_Diagnosis", "n")
+      }
     }
+    diagnosis <- diagnosis[order(diagnosis$Year_Diagnosis),] 
+    
+    h <- mean(diagnosis$n)
+    
+    m2 <- 1/(mean(data_filtered$new_survival, na.rm = TRUE))
+    
+    if(is.nan(m2) ==TRUE | is.na(m2)==TRUE)
+    {
+      m2 <- 0
+    }
+    
+    
+    m3 <- 1/(mean(data_filtered$new_survival_early, na.rm = TRUE))
+    
+    if(is.nan(m3) ==TRUE | is.na(m3)==TRUE)
+    {
+      m3 <- 0
+    }
+    
+    m3_mort <- (1-p)*m3+p*1
+    
+    
+    if(is.nan(m3_mort) ==TRUE | is.na(m3_mort)==TRUE)
+    {
+      m3_mort <- 0
+    }
+    
+    m1 <- 1/6
+    
+    r12 <- 0.9
+    r10 <- 1 - r12
+    
+    m10 <- r10*m1
+    m12 <- r12*m1
+    
+    survival_time <- mean(data_filtered$Survival_Months)
+    
+    estimate <- (1/(m10+m12)+m12/(m3*(m10+m12))) -  (1/(m10+m12)+m12/(m2*(m10+m12)))
+    estimate2 <- (1/(m10+m12)+m12/(m3_mort*(m10+m12))) -  (1/(m10+m12)+m12/(m2*(m10+m12)))
+    
+    df_pancreas5[x_i, 1] <- p
+    df_pancreas5[x_i, 2] <- a
+    df_pancreas5[x_i, 3] <- estimate
+    df_pancreas5[x_i, 4] <- estimate2
+    df_pancreas5[x_i, 5] <- m3
+    df_pancreas5[x_i, 6] <- m3_mort
+    x_i <- x_i + 1
   }
-  diagnosis <- diagnosis[order(diagnosis$Year_Diagnosis),] 
-  
-  h <- mean(diagnosis$n)
-  
-  m2 <- 1/(mean(data_filtered$new_survival, na.rm = TRUE))
-  
-  if(is.nan(m2) ==TRUE | is.na(m2)==TRUE)
-  {
-    m2 <- 0
-  }
-  
-  
-  m3 <- 1/(mean(data_filtered$new_survival_early, na.rm = TRUE))
-  
-  if(is.nan(m3) ==TRUE | is.na(m3)==TRUE)
-  {
-    m3 <- 0
-  }
-  
-  m3_mort <- (1-p)*m3+p*1
-  
-  
-  if(is.nan(m3_mort) ==TRUE | is.na(m3_mort)==TRUE)
-  {
-    m3_mort <- 0
-  }
-  
-  m1 <- 1/6
-  
-  r12 <- 0.9
-  r10 <- 1 - r12
-  
-  m10 <- r10*m1
-  m12 <- r12*m1
-  
-  survival_time <- mean(data_filtered$Survival_Months)
-  
-  estimate <- (1/(m10+m12)+m12/(m3*(m10+m12))) -  (1/(m10+m12)+m12/(m2*(m10+m12)))
-  estimate2 <- (1/(m10+m12)+m12/(m3_mort*(m10+m12))) -  (1/(m10+m12)+m12/(m2*(m10+m12)))
-  
-  df_pancreas5[x_i, 1] <- p
-  df_pancreas5[x_i, 2] <- estimate
-  df_pancreas5[x_i, 3] <- estimate2
-  df_pancreas5[x_i, 4] <- m3
-  df_pancreas5[x_i, 5] <- m3_mort
-  x_i <- x_i + 1
 }
 ```
 
 ```{r, fig.width = 10}
-ggplot(as.data.frame(df_pancreas5))+
-  geom_col(aes(V1*100, V3/12, fill = V3/12), color = "black")+
-  ylab("Expected Residual Lifetime Gained (Years)")+
+ggplot(as.data.frame(df_pancreas5), aes(x = V1*100, y = V2, fill = V4/12))+
+  geom_tile()+
   xlab("Chance of Mortality (%)")+
+  ylab("Treatment Effectiveness")+
   ggtitle("African American Women, 55-59")+
   theme_light()+
-    theme(axis.text.x = element_text(size = 28),
-        axis.text.y = element_text(size = 28),
+  scale_fill_distiller(palette = "GnBu")+
+  scale_x_continuous(expand = c(0,0), breaks = seq(0, 0.1, by = 0.025))+
+  scale_y_continuous(expand = c(0,0), breaks = seq(0.25, 1, by = 0.25))+
+  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
+        strip.text = element_text(size = 20),
         axis.title = element_text( size = 28),
+        axis.text.y = element_text(size = 24),
+        axis.title.x = element_text(vjust = -0.5),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.position = "none",
-        title = element_text(size = 28))
+        legend.text = element_text(size = 24),
+        legend.title = element_text(size = 24),
+        title = element_text(size = 28),
+        legend.key.height = unit(2.5, "cm"))+
+  labs(fill='Expected Residual\nLifetime Gained\n(Years)') 
 ```
 
 MORBIDITY
@@ -1879,11 +2008,11 @@ for(i in 1:nrow(plot_data_pancreas75))
   for(j in seq(0.8, 1, by = 0.05))
   {
     estimate <- (1/(plot_data_pancreas75$m10[i]+plot_data_pancreas75$m12[i])+plot_data_pancreas75$m12[i]/(plot_data_pancreas75$m3[i]*(plot_data_pancreas75$m10[i]+plot_data_pancreas75$m12[i])))*j -  (1/(plot_data_pancreas75$m10[i]+plot_data_pancreas75$m12[i])+plot_data_pancreas75$m12[i]/(plot_data_pancreas75$m2[i]*(plot_data_pancreas75$m10[i]+plot_data_pancreas75$m12[i])))
-    df6_pancreas[x_i, 1] <- plot_data_pancreas75$age[i]
-    df6_pancreas[x_i, 2] <- plot_data_pancreas75$race[i]
-    df6_pancreas[x_i, 3] <- plot_data_pancreas75$sex[i]
-    df6_pancreas[x_i, 4] <- j
-    df6_pancreas[x_i, 5] <- estimate
+    df_pancreas6[x_i, 1] <- plot_data_pancreas75$age[i]
+    df_pancreas6[x_i, 2] <- plot_data_pancreas75$race[i]
+    df_pancreas6[x_i, 3] <- plot_data_pancreas75$sex[i]
+    df_pancreas6[x_i, 4] <- j
+    df_pancreas6[x_i, 5] <- estimate
     x_i <- x_i + 1
   }
 }
@@ -2309,6 +2438,7 @@ for(i in 1:nrow(h_data_full))
   }
 }
 h_data_full <- h_data_full %>% drop_na
+h_data_full$order <- ifelse(h_data_full$data == "Empirical", "1", "2")
 
 N1_data2 <- N1_data %>% drop_na()
 N1_data2$data <- "Empirical"
@@ -2329,6 +2459,7 @@ for(i in 1:nrow(N1_data_full))
   }
 }
 N1_data_full <- N1_data_full %>% drop_na
+N1_data_full$order <- ifelse(N1_data_full$data == "Empirical", "1", "2")
 
 N2_data2 <- N2_data %>% drop_na()
 N2_data2$data <- "Empirical"
@@ -2349,6 +2480,8 @@ for(i in 1:nrow(N2_data_full))
   }
 }
 N2_data_full <- N2_data_full %>% drop_na
+N2_data_full$order <- ifelse(N2_data_full$data == "Empirical", "1", "2")
+
 
 #subset by ethnicity
 h_data_full_c <- h_data_full %>% filter(race == "Caucasian")
@@ -2356,11 +2489,11 @@ h_data_full_aa <- h_data_full %>% filter(race == "African American")
 h_data_full_ap <- h_data_full %>% filter(race == "Asian or Pacific Islander")
 h_data_full_h <- h_data_full %>% filter(race == "Hispanic")
 
-fills <- c("Empirical" = "steelblue", "Assumed" = "salmon")
+fills <- c("1" = "steelblue", "2" = "salmon")
 ggplot() +
-  geom_density(data = h_data_full_c, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = h_data_full_c, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Assumed"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Assumed"))+ 
   ggtitle("Do Exogenous Arrivals Constitute a Homogeneous Poisson Point Process - Caucasians")+
   xlab("Number of New Diagnoses in a Year")+
   ylab("Smoothed Probability Mass")+
@@ -2374,11 +2507,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Assumed" = "salmon")
 ggplot() +
-  geom_density(data = h_data_full_aa, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = h_data_full_aa, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Assumed"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Assumed"))+ 
   ggtitle("Do Exogenous Arrivals Constitute a Homogeneous Poisson Point Process - African Americans")+
   xlab("Number of New Diagnoses in a Year")+
   ylab("Smoothed Probability Mass")+
@@ -2392,11 +2524,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Assumed" = "salmon")
 ggplot() +
-  geom_density(data = h_data_full_ap, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = h_data_full_ap, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Assumed"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Assumed"))+ 
   ggtitle("Do Exogenous Arrivals Constitute a Homogeneous Poisson Point Process - Asian or Pacific Islanders")+
   xlab("Number of New Diagnoses in a Year")+
   ylab("Smoothed Probability Mass")+
@@ -2410,11 +2541,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Assumed" = "salmon")
 ggplot() +
-  geom_density(data = h_data_full_h, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = h_data_full_h, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Assumed"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Assumed"))+ 
   ggtitle("Do Exogenous Arrivals Constitute a Homogeneous Poisson Point Process - Hispanics")+
   xlab("Number of New Diagnoses in a Year")+
   ylab("Smoothed Probability Mass")+
@@ -2433,11 +2563,10 @@ N1_data_full_aa <- N1_data_full %>% filter(race == "African American")
 N1_data_full_ap <- N1_data_full %>% filter(race == "Asian or Pacific Islander")
 N1_data_full_h <- N1_data_full %>% filter(race == "Hispanic")
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N1_data_full_c, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N1_data_full_c, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[1]^"*"," - Caucasians")))+
   xlab("Number of Pancreatic Cancer Sufferers at a Given Time Diagnosed and Awaiting Surgery")+
   ylab("Smoothed Probability Mass")+
@@ -2451,11 +2580,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N1_data_full_aa, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N1_data_full_aa, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[1]^"*"," - African Americans")))+
   xlab("Number of Pancreatic Cancer Sufferers at a Given Time Diagnosed and Awaiting Surgery")+
   ylab("Smoothed Probability Mass")+
@@ -2469,11 +2597,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N1_data_full_ap, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N1_data_full_ap, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[1]^"*"," - Asian or Pacific Islanders")))+
   xlab("Number of Pancreatic Cancer Sufferers at a Given Time Diagnosed and Awaiting Surgery")+
   ylab("Smoothed Probability Mass")+
@@ -2487,11 +2614,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N1_data_full_h, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N1_data_full_h, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[1]^"*"," - Hispanics")))+
   xlab("Number of Pancreatic Cancer Sufferers at a Given Time Diagnosed and Awaiting Surgery")+
   ylab("Smoothed Probability Mass")+
@@ -2510,11 +2636,10 @@ N2_data_full_aa <- N2_data_full %>% filter(race == "African American")
 N2_data_full_ap <- N2_data_full %>% filter(race == "Asian or Pacific Islander")
 N2_data_full_h <- N2_data_full %>% filter(race == "Hispanic")
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N2_data_full_c, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N2_data_full_c, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[2]^"*"," - Caucasians")))+
   xlab("Number of Pancreatic Cancer Sufferers Receiving Surgery in a Given Year")+
   ylab("Smoothed Probability Mass")+
@@ -2528,11 +2653,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N2_data_full_aa, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N2_data_full_aa, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[2]^"*"," - African Americans")))+
   xlab("Number of Pancreatic Cancer Sufferers Receiving Surgery in a Given Year")+
   ylab("Smoothed Probability Mass")+
@@ -2546,11 +2670,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N2_data_full_ap, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N2_data_full_ap, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[2]^"*"," - Asian or Pacific Islanders")))+
   xlab("Number of Pancreatic Cancer Sufferers Receiving Surgery in a Given Year")+
   ylab("Smoothed Probability Mass")+
@@ -2564,11 +2687,10 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 
-fills <- c("Empirical" = "steelblue", "Predicted" = "salmon")
 ggplot() +
-  geom_density(data = N2_data_full_h, aes(x = n, fill = data), alpha = 0.5, bw = 10)+
+  geom_density(data = N2_data_full_h, aes(x = n, fill = order), alpha = 0.5, bw = 10)+
   facet_wrap(~age+sex, ncol=6)+
-  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("Empirical", "Predicted"))+ 
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
   ggtitle(expression(paste("Distribution of ", N[2]^"*"," - Hispanics")))+
   xlab("Number of Pancreatic Cancer Sufferers Receiving Surgery in a Given Year")+
   ylab("Smoothed Probability Mass")+
@@ -2582,3 +2704,60 @@ ggplot() +
         legend.position = "bottom",
         aspect.ratio=0.4)
 ```
+
+INDIVIDUAL ASSUMPTION PLOTS FOR FIGURES
+
+```{r, fig.width=10}
+fills <- c("1" = "steelblue", "2" = "salmon")
+ggplot() +
+  geom_density(data = h_data_full_aa %>% filter(age == "75-79 years" & race == "African American" & sex == "Female"), aes(x = n, fill = order), alpha = 0.5, bw = 10)+
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels = c("Empirical", "Assumed"))+ 
+  scale_x_continuous(limits=c(30, 150))+
+  ggtitle("Do Exogenous Arrivals Constitute a Homogeneous Poisson Point Process\nAfrican American Women 75-79")+
+  xlab("Number of New Diagnoses in a Year")+
+  ylab("Smoothed Probability Mass")+
+  theme_light()+
+  theme(title = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.text.x = element_text(size = 28),
+        axis.text.y = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.position = "bottom",
+        aspect.ratio=0.4)
+
+ggplot() +
+  geom_density(data = N1_data_full_aa %>% filter(age == "75-79 years" & race == "African American" & sex == "Female"), aes(x = n, fill = order), alpha = 0.5, bw = 10)+
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
+  scale_x_continuous(limits=c(0, 100))+
+  ggtitle(expression(paste("Distribution of ", N[1]^"*","- African American Women 75-79")))+
+  xlab("Number of Pancreatic Cancer Sufferers at a Given Time Diagnosed and Awaiting Surgery")+
+  ylab("Smoothed Probability Mass")+
+  theme_light()+
+  theme(title = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.text.x = element_text(size = 28),
+        axis.text.y = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.position = "bottom",
+        aspect.ratio=0.4)
+
+ggplot() +
+  geom_density(data = N2_data_full_aa %>% filter(age == "75-79 years" & race == "African American" & sex == "Female"), aes(x = n, fill = order), alpha = 0.5, bw = 10)+
+  scale_fill_manual(name = "Distribution:", values = fills, breaks=c("1", "2"), labels=c("Empirical", "Predicted"))+ 
+  scale_x_continuous(limits=c(0, 75))+
+  ggtitle(expression(paste("Distribution of ", N[2]^"*","- African American Women 75-79")))+
+  xlab("Number of Pancreatic Cancer Sufferers Receiving Surgery in a Given Year")+
+  ylab("Smoothed Probability Mass")+
+  theme_light()+
+  theme(title = element_text(size = 28),
+        axis.title = element_text( size = 28),
+        axis.text.x = element_text(size = 28),
+        axis.text.y = element_text(size = 28),
+        legend.title = element_text(size = 28),
+        legend.text = element_text(size = 28),
+        legend.position = "bottom",
+        aspect.ratio=0.4)
+```
+
