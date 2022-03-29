@@ -234,14 +234,14 @@ ggplot(df_slope1) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
 left_label <- df_slope2$cancer
 right_label1 <- paste(df_slope2$cancer, "25% effectiveness", sep=", ")
@@ -267,14 +267,14 @@ ggplot(df_slope2) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
 left_label <- df_slope3$cancer
 right_label1 <- paste(df_slope3$cancer, "25% effectiveness", sep=", ")
@@ -300,14 +300,14 @@ ggplot(df_slope3) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
 left_label <- df_slope4$cancer
 right_label1 <- paste(df_slope4$cancer, "25% effectiveness", sep=", ")
@@ -333,14 +333,14 @@ ggplot(df_slope4) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
 left_label <- df_slope5$cancer
 right_label1 <- paste(df_slope5$cancer, "25% effectiveness", sep=", ")
@@ -366,14 +366,14 @@ ggplot(df_slope5) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
 left_label <- df_slope6$cancer
 right_label1 <- paste(df_slope6$cancer, "25% effectiveness", sep=", ")
@@ -399,14 +399,14 @@ ggplot(df_slope6) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
 left_label <- df_slope7$cancer
 right_label1 <- paste(df_slope7$cancer, "25% effectiveness", sep=", ")
@@ -432,14 +432,14 @@ ggplot(df_slope7) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
 left_label <- df_slope8$cancer
 right_label1 <- paste(df_slope8$cancer, "25% effectiveness", sep=", ")
@@ -465,14 +465,14 @@ ggplot(df_slope8) +
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
         title = element_text(size = 48),
-        axis.title.y = element_text(size = 32),
-        axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
-        legend.title = element_text(size = 32),
-        legend.text = element_text(size = 24),
+        axis.title.y = element_text(size = 36),
+        axis.title.x = element_text(size = 36),
+        axis.text.y = element_text(size = 36),
+        axis.text.x = element_text(size = 36),
+        legend.title = element_text(size = 36),
+        legend.text = element_text(size = 36),
         legend.position = "bottom")+
-  guides(color = guide_legend(order = 1), linetype = guide_legend(order = 2))
+  guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 ```
 
 ```{r}
@@ -675,7 +675,7 @@ ggplot()+
   scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(vjust = 0.5, hjust=1, size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -701,7 +701,7 @@ ggplot()+
   scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(vjust = 0.5, hjust=1, size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -727,7 +727,7 @@ ggplot()+
   scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(vjust = 0.5, hjust=1, size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -754,7 +754,7 @@ ggplot()+
   scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(vjust = 0.5, hjust=1, size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -780,7 +780,7 @@ ggplot()+
   scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(vjust = 0.5, hjust=1, size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -806,7 +806,7 @@ ggplot()+
   scale_fill_manual(values = colors, breaks=c("Unscreened","Screened (25% Effectiveness)","Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(vjust = 0.5, hjust=1, size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -846,7 +846,7 @@ ggplot(esophagus_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "
   facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -868,7 +868,7 @@ ggplot(kidney_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-
   facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -890,7 +890,7 @@ ggplot(liver_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-0
   facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -913,7 +913,7 @@ ggplot(mesothelioma_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years"
   facet_grid(~Race_Origin+Sex)+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -935,7 +935,7 @@ ggplot(ovary_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "05-0
   facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
@@ -957,7 +957,7 @@ ggplot(pancreas_dumbbell %>% filter(Age_Cat %in% c("00 years", "01-04 years", "0
   facet_grid(rows = vars(Sex), cols = vars(Race_Origin))+
   theme_light()+
   theme(title = element_text(size = 32),
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 28),
+        axis.text.x = element_text(size = 28),
         axis.text.y = element_text(size = 28),
         axis.title = element_text(size = 28),
         axis.title.y = element_text(size = 28, hjust = 0.5),
