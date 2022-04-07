@@ -26,8 +26,8 @@ library(scales)
 ```
 
 ```{r}
-df_slope1 <- as.data.frame(matrix(0, 6, 5))
-colnames(df_slope1) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope1 <- as.data.frame(matrix(0, 6, 4))
+colnames(df_slope1) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope1$cancer <- c("esophagus", "kidney", "liver", "mesothelioma", "ovary", "pancreas")
 
 # make dataframe for slope plots
@@ -54,10 +54,8 @@ df_slope1$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "
                   sum(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
 
-df_slope1$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_mesothelioma$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
-
-df_slope2 <- as.data.frame(matrix(0, 5, 5))
-colnames(df_slope2) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope2 <- as.data.frame(matrix(0, 5, 4))
+colnames(df_slope2) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope2$cancer <- c("esophagus", "kidney", "liver", "mesothelioma", "pancreas")
 
 df_slope2$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
@@ -78,10 +76,8 @@ df_slope2$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "
                   sum(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(mesothelioma_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Caucasian") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
 
-df_slope2$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_mesothelioma$Lifetime[2], strategy_pancreas$Lifetime[2])
-
-df_slope3 <- as.data.frame(matrix(0, 4, 5))
-colnames(df_slope3) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope3 <- as.data.frame(matrix(0, 4, 4))
+colnames(df_slope3) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope3$cancer <- c("kidney", "liver", "ovary", "pancreas")
 
 df_slope3$survival1 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
@@ -99,10 +95,8 @@ df_slope3$survival3 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "His
                   sum(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
 
-df_slope3$strategy <- c(strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
-
-df_slope4 <- as.data.frame(matrix(0, 3, 5))
-colnames(df_slope4) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope4 <- as.data.frame(matrix(0, 3, 4))
+colnames(df_slope4) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope4$cancer <- c("kidney", "liver", "pancreas")
 
 df_slope4$survival1 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
@@ -117,10 +111,8 @@ df_slope4$survival3 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "His
                   sum(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Hispanic") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
 
-df_slope4$strategy <- c(strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_pancreas$Lifetime[2])
-
-df_slope5 <- as.data.frame(matrix(0, 5, 5))
-colnames(df_slope5) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope5 <- as.data.frame(matrix(0, 5, 4))
+colnames(df_slope5) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope5$cancer <- c("esophagus", "kidney", "liver", "ovary", "pancreas")
 
 df_slope5$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
@@ -141,10 +133,8 @@ df_slope5$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "
                   sum(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
 
-df_slope5$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
-
-df_slope6 <- as.data.frame(matrix(0, 4, 5))
-colnames(df_slope6) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope6 <- as.data.frame(matrix(0, 4, 4))
+colnames(df_slope6) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope6$cancer <- c("esophagus", "kidney", "liver", "pancreas")
 
 df_slope6$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
@@ -162,10 +152,8 @@ df_slope6$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "
                   sum(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "African American") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
 
-df_slope6$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_pancreas$Lifetime[2])
-
-df_slope7 <- as.data.frame(matrix(0, 4, 5))
-colnames(df_slope7) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope7 <- as.data.frame(matrix(0, 4, 4))
+colnames(df_slope7) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope7$cancer <- c("kidney", "liver", "ovary", "pancreas")
 
 df_slope7$survival1 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
@@ -183,10 +171,8 @@ df_slope7$survival3 <- c(sum(kidney_data_survival %>% filter(Race_Origin == "Asi
                   sum(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(ovary_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Female") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
 
-df_slope7$strategy <- c(strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_ovary$Lifetime[2], strategy_pancreas$Lifetime[2])
-
-df_slope8 <- as.data.frame(matrix(0, 4, 5))
-colnames(df_slope8) <- c("cancer", "survival1", "survival2", "survival3", "strategy")
+df_slope8 <- as.data.frame(matrix(0, 4, 4))
+colnames(df_slope8) <- c("cancer", "survival1", "survival2", "survival3")
 df_slope8$cancer <- c("esophagus", "kidney", "liver", "pancreas")
 
 df_slope8$survival1 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival))/nrow(esophagus_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(new_survival)),
@@ -203,8 +189,6 @@ df_slope8$survival3 <- c(sum(esophagus_data_survival %>% filter(Race_Origin == "
                   sum(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(kidney_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(liver_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)),
                   sum(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75))/nrow(pancreas_data_survival %>% filter(Race_Origin == "Asian or Pacific Islander") %>% filter(Sex == "Male") %>% filter(Age_Cat == "50-54 years") %>% select(Survival_Months_Gained_screened_all_75)))
-
-df_slope8$strategy <- c(strategy_esophagus$Lifetime[2], strategy_kidney$Lifetime[2], strategy_liver$Lifetime[2], strategy_pancreas$Lifetime[2])
 ```
 
 SLOPE PLOTS
@@ -225,7 +209,7 @@ ggplot(df_slope1) +
   ylim(min(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12), 1.1*max(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope1$survival1/12, df_slope1$survival2/12, df_slope1$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of Caucasian Women, \n50-54 from Different Cancers")+
+  ggtitle("Overall Survival of Caucasian Women, 50-54 from Different Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
   theme(panel.background = element_blank(), 
@@ -233,13 +217,13 @@ ggplot(df_slope1) +
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
@@ -258,21 +242,21 @@ ggplot(df_slope2) +
   ylim(min(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12), 1.1*max(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope2$survival1/12, df_slope2$survival2/12, df_slope2$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of Caucasian Men, \n50-54 from Different Cancers")+
+  ggtitle("Overall Survival of Caucasian Men, 50-54 from Different Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
-  theme(panel.background = element_blank(), 
+ theme(panel.background = element_blank(), 
         panel.grid = element_blank(),
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
@@ -291,21 +275,21 @@ ggplot(df_slope3) +
   ylim(min(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12), 1.1*max(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope3$survival1/12, df_slope3$survival2/12, df_slope3$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of Hispanic Women, \n50-54 from Different Cancers")+
+  ggtitle("Overall Survival of Hispanic Women, 50-54 from Different Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
-  theme(panel.background = element_blank(), 
+ theme(panel.background = element_blank(), 
         panel.grid = element_blank(),
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
@@ -324,7 +308,7 @@ ggplot(df_slope4) +
   ylim(min(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12), 1.1*max(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope4$survival1/12, df_slope4$survival2/12, df_slope4$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of Hispanic Men, \n50-54 from Different Cancers")+
+  ggtitle("Overall Survival of Hispanic Men, 50-54 from Different Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
   theme(panel.background = element_blank(), 
@@ -332,13 +316,13 @@ ggplot(df_slope4) +
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
@@ -357,7 +341,7 @@ ggplot(df_slope5) +
   ylim(min(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12), 1.1*max(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope5$survival1/12, df_slope5$survival2/12, df_slope5$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of African American Women, \n50-54 from Different Cancers")+
+  ggtitle("Overall Survival of African American Women, 50-54 from\nDifferent Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
   theme(panel.background = element_blank(), 
@@ -365,13 +349,13 @@ ggplot(df_slope5) +
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
@@ -390,7 +374,7 @@ ggplot(df_slope6) +
   ylim(min(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12), 1.1*max(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope6$survival1/12, df_slope6$survival2/12, df_slope6$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of African American Men, \n50-54 from Different Cancers")+
+  ggtitle("Overall Survival of African American Men, 50-54 from\nDifferent Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
   theme(panel.background = element_blank(), 
@@ -398,13 +382,13 @@ ggplot(df_slope6) +
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
@@ -423,7 +407,7 @@ ggplot(df_slope7) +
   ylim(min(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12), 1.1*max(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope7$survival1/12, df_slope7$survival2/12, df_slope7$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of Asian or Pacific Islander \nWomen, 50-54 from Different Cancers")+
+  ggtitle("Overall Survival of Asian or Pacific Islander Women, 50-54 from\nDifferent Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
   theme(panel.background = element_blank(), 
@@ -431,13 +415,13 @@ ggplot(df_slope7) +
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 
@@ -456,7 +440,7 @@ ggplot(df_slope8) +
   ylim(min(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12), 1.1*max(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12))+ 
   geom_text(label="Survival Without Early Screening", x=1, y=1.1*max(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12), hjust=-0.01, size=12)+ 
   geom_text(label="Survival With Early Screening", x=2, y=1.1*max(df_slope8$survival1/12, df_slope8$survival2/12, df_slope8$survival3/12), hjust=1.01, size=12)+
-  ggtitle("Overall Survival of Asian or Pacific Islander Men, \n50-54 from Different Cancers")+
+  ggtitle("Overall Survival of Asian or Pacific Islander Men, 50-54 from \nDifferent Cancers")+
   scale_linetype_manual(name = "Effectiveness", values = lines)+
   theme_classic()+ 
   theme(panel.background = element_blank(), 
@@ -464,13 +448,13 @@ ggplot(df_slope8) +
         axis.ticks = element_blank(),
         panel.border = element_blank(),
         plot.margin = unit(c(1,2,1,2), "cm"),
-        title = element_text(size = 48),
-        axis.title.y = element_text(size = 36),
-        axis.title.x = element_text(size = 36),
-        axis.text.y = element_text(size = 36),
-        axis.text.x = element_text(size = 36),
-        legend.title = element_text(size = 36),
-        legend.text = element_text(size = 36),
+        title = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        axis.title.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
         legend.position = "bottom")+
   guides(color = guide_legend(order = 1, nrow = 2), linetype = guide_legend(order = 2, nrow = 2))
 ```
@@ -514,11 +498,11 @@ ggplot(cancer_data_all) + geom_violin(aes(cancer, new_survival/12, fill = "0%"),
   labs(title="Violin Plot of Cancer Type Survival Distributions",
        y = "Survival Time (Years)",
        x = "Cancer Types") + 
-  theme(title = element_text(size = 48),
+  theme(title = element_text(size = 32),
         axis.title.y = element_text(size = 32),
         axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 28),
-        axis.text.x = element_text(size = 28),
+        axis.text.y = element_text(size = 32),
+        axis.text.x = element_text(size = 32),
         legend.title = element_text(size = 32),
         legend.text = element_text(size = 32),
         legend.position = "bottom")
@@ -539,14 +523,14 @@ ggplot(plot_data_pancreas75, aes(x=age, y = estimate/12, color=race))+
   xlab("Age")+
   ggtitle("Pancreatic Cancer")+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28))+
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))+
   guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
 
 plot_data_esophagus75 <- plot_data_esophagus75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
@@ -560,14 +544,14 @@ ggplot(plot_data_esophagus75, aes(x=age, y = estimate/12, color=race))+
   xlab("Age")+
   ggtitle("Esophageal Cancer")+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28))+
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))+
   guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
 
 plot_data_kidney75 <- plot_data_kidney75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
@@ -581,14 +565,14 @@ ggplot(plot_data_kidney75, aes(x=age, y = estimate/12, color=race))+
   xlab("Age")+
   ggtitle("Kidney Cancer")+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28))+
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))+
   guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
 
 plot_data_liver75 <- plot_data_liver75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
@@ -602,14 +586,14 @@ ggplot(plot_data_liver75, aes(x=age, y = estimate/12, color=race))+
   xlab("Age")+
   ggtitle("Liver Cancer")+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28))+
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))+
   guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
 
 plot_data_mesothelioma75 <- plot_data_mesothelioma75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
@@ -623,14 +607,14 @@ ggplot(plot_data_mesothelioma75, aes(x=age, y = estimate/12, color=race))+
   xlab("Age")+
   ggtitle("Mesothelioma")+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28))+
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))+
   guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
 
 plot_data_ovary75 <- plot_data_ovary75 %>% filter(age %in% c("00 years", "01-04 years", "05-09 years", "10-14 years", "15-19 years", "20-24 years") == FALSE)
@@ -644,14 +628,14 @@ ggplot(plot_data_ovary75, aes(x=age, y = estimate/12, color=race))+
   xlab("Age")+
    ggtitle("Ovarian Cancer")+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28))+
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))+
   guides(color = guide_legend(order = 1), size = guide_legend(order = 2))
 ```
 

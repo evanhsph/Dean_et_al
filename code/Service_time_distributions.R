@@ -22,13 +22,13 @@ ggplot(df,aes(values,fill=Model))+
   ylab("Probability Density")+
   theme_classic()+
   geom_vline(xintercept=sample_mean,color="blue",size=1.5)+
-  theme(axis.text.x = element_text(color = "grey20", size = 16),
-        axis.text.y = element_text(color = "grey20", size = 16),  
-        axis.title.x = element_text(size = 20),
-        axis.title.y = element_text(size = 20),
-        legend.title=element_text(size=16), 
-        legend.text=element_text(size=14),
-        plot.title = element_text(size=24, face="bold", margin = margin(10, 0, 10, 0)))
+  theme(axis.text.x = element_text(color = "grey20", size = 32),
+        axis.text.y = element_text(color = "grey20", size = 32),  
+        axis.title.x = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        legend.title=element_text(size=32), 
+        legend.text=element_text(size=32),
+        title = element_text(size=32, margin = margin(10, 0, 10, 0)))
 
 
 
@@ -55,14 +55,13 @@ ggplot(df,aes(values,fill=Model))+
   ylab("Probability Density")+
   theme_classic()+
   geom_vline(xintercept=sample_mean,color="blue",size=1.5)+
-  theme(axis.text.x = element_text(color = "grey20", size = 16),
-      axis.text.y = element_text(color = "grey20", size = 16),  
-      axis.title.x = element_text(size = 20),
-      axis.title.y = element_text(size = 20),
-      legend.title=element_text(size=16), 
-      legend.text=element_text(size=14),
-      plot.title = element_text(size=24, face="bold", margin = margin(10, 0, 10, 0)))
-
+  theme(axis.text.x = element_text(color = "grey20", size = 32),
+        axis.text.y = element_text(color = "grey20", size = 32),  
+        axis.title.x = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        legend.title=element_text(size=32), 
+        legend.text=element_text(size=32),
+        title = element_text(size=32, margin = margin(10, 0, 10, 0)))
 
 
 
@@ -88,15 +87,14 @@ ggplot(df,aes(values,fill=Model))+
   ylab("Probability Density")+
   theme_classic()+
   geom_vline(xintercept=sample_mean,color="blue",size=1.5)+
-  theme(axis.text.x = element_text(color = "grey20", size = 16),
-        axis.text.y = element_text(color = "grey20", size = 16),  
-        axis.title.x = element_text(size = 20),
-        axis.title.y = element_text(size = 20),
-        legend.title=element_text(size=16), 
-        legend.text=element_text(size=14),
-        plot.title = element_text(size=24, face="bold", margin = margin(10, 0, 10, 0)))
+  theme(axis.text.x = element_text(color = "grey20", size = 32),
+        axis.text.y = element_text(color = "grey20", size = 32),  
+        axis.title.x = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        legend.title=element_text(size=32), 
+        legend.text=element_text(size=32),
+        title = element_text(size=32, margin = margin(10, 0, 10, 0)))
 
 
 exp(-(1/sample_mean)*1.5) #Pr(Wait time > 1.5) = 0.135
 pexp(1.5,rate=1/sample_mean,lower.tail = FALSE) #Pr(Wait time > 1.5) = 0.135
-

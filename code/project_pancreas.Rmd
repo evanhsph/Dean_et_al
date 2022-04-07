@@ -1245,10 +1245,10 @@ ggsurvplot(fit_pancreas, data = pancreas_data_survival, combine = TRUE, # Combin
            legend = c(0.8, 0.8),
            legend.title="Screening Status:",
            legend.lab=c("Unscreened", "Screened (25% Effectiveness)", "Screened (50% Effectiveness)", "Screened (75% Effectiveness)", "Screened (100% Effectiveness)"),
-           font.x = c(28),
-           font.y = c(28),
-           font.tickslab = c(28),
-           font.legend = c(28),
+           font.x = c(32),
+           font.y = c(32),
+           font.tickslab = c(32),
+           font.legend = c(32),
            xlab = "Years", 
            ylab = "Survival Probability"#,
            )
@@ -1295,15 +1295,15 @@ ggplot(pancreas_data_survival %>% filter(Race_Origin == "Hispanic", Sex == "Fema
   ylab("Age")+
   ggtitle("Hispanic Women")+
   theme_light()+
-  theme(axis.text.x = element_text(, vjust = 0.5, hjust=1, size = 28),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 26),
+        strip.text = element_text(size = 32),
         legend.position = "bottom",
-        legend.text = element_text(size = 16),
-        legend.title = element_text(size = 16),
-        title = element_text(size = 28))
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))
 ```
 
 LINE PLOT (75% Effectiveness)
@@ -1318,14 +1318,14 @@ ggplot(plot_data_pancreas75, aes(x=age, y = estimate/12, color=race))+
   ylab("Expected Residual Lifetime Gained (Years)")+
   xlab("Age")+
   theme_light()+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28))
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32))
 ```
 
 SOURCE FOR CATEGORY POPULATION DATA
@@ -1412,22 +1412,22 @@ strategy_pancreas3$group <- paste(strategy_pancreas3$Race_Origin, strategy_pancr
 ggplot(strategy_pancreas3, aes(group, estimate_dist/12*365, fill = Race_Origin)) + geom_violin(size = 1, scale = "width", trim = FALSE)+ geom_boxplot(width = 0.1, fill = "white")+facet_wrap(~age55, scale = "free")+
   labs(y = "Survival Time Per Screen (Days)",
        x = "Early Screening Strategy",
-       fill='Ancestry',
+       fill='Ancestry:',
        linetype = "Age Category") + 
   # scale_linetype_manual(values = c("dotted", "solid"))+
   # scale_size_manual(values = c(2, 0.5), guide = "none")+
   scale_fill_manual(values=c("#009E73", "#56B4E9", "#F0E442", "#E69F00", "#0072B2", "#D55E00", "#CC79A7"))+
     theme_light()+
-  theme(title = element_text(size = 48),
+  theme(title = element_text(size = 32),
         axis.title.y = element_text(size = 32),
         axis.title.x = element_text(size = 32),
-        axis.text.y = element_text(size = 24),
+        axis.text.y = element_text(size = 32),
         axis.text.x = element_blank(),
-        legend.title = element_text(size = 28),
+        legend.title = element_text(size = 32),
         # legend.title = element_blank(),
-        legend.text = element_text(size = 24),
+        legend.text = element_text(size = 32),
         legend.position = "bottom",
-        strip.text = element_text(size = 28))
+        strip.text = element_text(size = 32))
 ```
 
 HEAT MAP
@@ -1523,15 +1523,15 @@ ggplot(as.data.frame(df_pancreas2), aes(x = V1, y = V2, fill = V3/12))+
   scale_fill_distiller(palette = "RdPu")+
   scale_x_continuous(expand = c(0,0), breaks = seq(0, 1, by = 0.25))+
   scale_y_continuous(expand = c(0,0), breaks = seq(0.25, 1, by = 0.25))+
-  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
-        strip.text = element_text(size = 20),
-        axis.title = element_text( size = 28),
-        axis.text.y = element_text(size = 24),
+  theme(axis.text.x = element_text(size = 32),
+        strip.text = element_text(size = 32),
+        axis.title = element_text( size = 32),
+        axis.text.y = element_text(size = 32),
         axis.title.x = element_text(vjust = -0.5),
         axis.title.y = element_text(hjust = 0.5),
-        legend.text = element_text(size = 24),
-        legend.title = element_text(size = 24),
-        title = element_text(size = 28),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32),
         legend.key.height = unit(2.5, "cm"))+
   labs(fill='Expected Residual\nLifetime Gained\n(Years)') 
 ```
@@ -1629,14 +1629,14 @@ ggplot(as.data.frame(df_pancreas3))+
 )+
   theme_light()+
   ggtitle("African American Men, 65-69")+
-  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
-        axis.text.y = element_text(size = 28),
-        axis.title = element_text( size = 28),
+  theme(axis.text.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        axis.title = element_text( size = 32),
         axis.title.y = element_text(hjust = 0.5),
-        strip.text = element_text(size = 28),
-        legend.text = element_text(size = 24),
-        legend.title = element_text(size = 28),
-        title = element_text(size = 28),
+        strip.text = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32),
         legend.key.height = unit(2.5, "cm"))
 ```
 
@@ -1863,15 +1863,15 @@ ggplot(as.data.frame(df_pancreas4), aes(x = V1*100, y = V2, fill = V4/8366815*30
   scale_fill_distiller(palette = "OrRd")+
   scale_x_continuous(expand = c(0,0), breaks = seq(0, 0.1, by = 0.025))+
   scale_y_continuous(expand = c(0,0), breaks = seq(0.25, 1, by = 0.25))+
-  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
-        strip.text = element_text(size = 20),
-        axis.title = element_text( size = 28),
-        axis.text.y = element_text(size = 24),
+  theme(axis.text.x = element_text(size = 32),
+        strip.text = element_text(size = 32),
+        axis.title = element_text( size = 32),
+        axis.text.y = element_text(size = 32),
         axis.title.x = element_text(vjust = -0.5),
         axis.title.y = element_text(hjust = 0.5),
-        legend.text = element_text(size = 24),
-        legend.title = element_text(size = 24),
-        title = element_text(size = 28),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32),
         legend.key.height = unit(2.5, "cm"))+
   labs(fill="Average Net Survival\nBenefit Per Screen\n(Days)") 
 ```
@@ -1984,15 +1984,15 @@ ggplot(as.data.frame(df_pancreas5), aes(x = V1*100, y = V2, fill = V4/12))+
   scale_fill_distiller(palette = "GnBu")+
   scale_x_continuous(expand = c(0,0), breaks = seq(0, 0.1, by = 0.025))+
   scale_y_continuous(expand = c(0,0), breaks = seq(0.25, 1, by = 0.25))+
-  theme(axis.text.x = element_text(vjust = 0.5, hjust=1, size = 24),
-        strip.text = element_text(size = 20),
-        axis.title = element_text( size = 28),
-        axis.text.y = element_text(size = 24),
+  theme(axis.text.x = element_text(size = 32),
+        strip.text = element_text(size = 32),
+        axis.title = element_text( size = 32),
+        axis.text.y = element_text(size = 32),
         axis.title.x = element_text(vjust = -0.5),
         axis.title.y = element_text(hjust = 0.5),
-        legend.text = element_text(size = 24),
-        legend.title = element_text(size = 24),
-        title = element_text(size = 28),
+        legend.text = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        title = element_text(size = 32),
         legend.key.height = unit(2.5, "cm"))+
   labs(fill='Expected Residual\nLifetime Gained\n(Years)') 
 ```
@@ -2717,14 +2717,13 @@ ggplot() +
   xlab("Number of New Diagnoses in a Year")+
   ylab("Smoothed Probability Mass")+
   theme_light()+
-  theme(title = element_text(size = 28),
-        axis.title = element_text( size = 28),
-        axis.text.x = element_text(size = 28),
-        axis.text.y = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.position = "bottom",
-        aspect.ratio=0.4)
+  theme(title = element_text(size = 32),
+        axis.title = element_text( size = 32),
+        axis.text.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")
 
 ggplot() +
   geom_density(data = N1_data_full_aa %>% filter(age == "75-79 years" & race == "African American" & sex == "Female"), aes(x = n, fill = order), alpha = 0.5, bw = 10)+
@@ -2734,14 +2733,13 @@ ggplot() +
   xlab("Number of Pancreatic Cancer Sufferers at a Given Time Diagnosed and Awaiting Surgery")+
   ylab("Smoothed Probability Mass")+
   theme_light()+
-  theme(title = element_text(size = 28),
-        axis.title = element_text( size = 28),
-        axis.text.x = element_text(size = 28),
-        axis.text.y = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.position = "bottom",
-        aspect.ratio=0.4)
+  theme(title = element_text(size = 32),
+        axis.title = element_text( size = 32),
+        axis.text.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")
 
 ggplot() +
   geom_density(data = N2_data_full_aa %>% filter(age == "75-79 years" & race == "African American" & sex == "Female"), aes(x = n, fill = order), alpha = 0.5, bw = 10)+
@@ -2751,13 +2749,12 @@ ggplot() +
   xlab("Number of Pancreatic Cancer Sufferers Receiving Surgery in a Given Year")+
   ylab("Smoothed Probability Mass")+
   theme_light()+
-  theme(title = element_text(size = 28),
-        axis.title = element_text( size = 28),
-        axis.text.x = element_text(size = 28),
-        axis.text.y = element_text(size = 28),
-        legend.title = element_text(size = 28),
-        legend.text = element_text(size = 28),
-        legend.position = "bottom",
-        aspect.ratio=0.4)
+  theme(title = element_text(size = 32),
+        axis.title = element_text( size = 32),
+        axis.text.x = element_text(size = 32),
+        axis.text.y = element_text(size = 32),
+        legend.title = element_text(size = 32),
+        legend.text = element_text(size = 32),
+        legend.position = "bottom")
 ```
 
