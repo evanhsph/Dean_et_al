@@ -1,0 +1,104 @@
+```{r, fig.width = 10}
+library(ggplot2)
+
+n <- 1000000
+
+lognorm <- rlnorm(n,meanlog=1,sdlog=1.3)
+
+sample_mean <- mean(lognorm)
+
+exponential <- rexp(n,rate=1/sample_mean)
+
+Model <- c(rep("Queue",n),rep("Markov",n))
+
+values <- c(lognorm,exponential)
+
+df <- cbind.data.frame(values,Model)
+
+ggplot(df,aes(values,fill=Model))+
+  geom_density(alpha=0.4)+
+  xlim(c(0,25))+
+  ggtitle("Waiting Time Distributions")+
+  xlab("Waiting Times")+
+  ylab("Probability Density")+
+  theme_classic()+
+  geom_vline(xintercept=sample_mean,color="blue",size=1.5)+
+  theme(axis.text.x = element_text(color = "grey20", size = 32),
+        axis.text.y = element_text(color = "grey20", size = 32),  
+        axis.title.x = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        legend.title=element_text(size=32), 
+        legend.text=element_text(size=32),
+        title = element_text(size=32, margin = margin(10, 0, 10, 0)))
+
+
+
+
+n <- 1000000
+
+mixnorm <- c(rnorm(n/2,mean=5,sd=1),rnorm(n/2,mean=15,sd=1))
+
+sample_mean <- mean(mixnorm)
+
+exponential <- rexp(n,rate=1/sample_mean)
+
+Model <- c(rep("Queue",n),rep("Markov",n))
+
+values <- c(mixnorm,exponential)
+
+df <- cbind.data.frame(values,Model)
+
+ggplot(df,aes(values,fill=Model))+
+  geom_density(alpha=0.4)+
+  xlim(c(0,25))+
+  ggtitle("Waiting Time Distributions")+
+  xlab("Waiting Times")+
+  ylab("Probability Density")+
+  theme_classic()+
+  geom_vline(xintercept=sample_mean,color="blue",size=1.5)+
+  theme(axis.text.x = element_text(color = "grey20", size = 32),
+        axis.text.y = element_text(color = "grey20", size = 32),  
+        axis.title.x = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        legend.title=element_text(size=32), 
+        legend.text=element_text(size=32),
+        title = element_text(size=32, margin = margin(10, 0, 10, 0)))
+
+
+
+n <- 1000000
+
+mixunif <- c(runif(n/2,min=0,max=1/2),runif(n/2,min=1,max=3/2))
+
+sample_mean <- mean(mixunif)
+
+exponential <- rexp(n,rate=1/sample_mean)
+
+Model <- c(rep("Queue",n),rep("Markov",n))
+
+values <- c(mixunif,exponential)
+
+df <- cbind.data.frame(values,Model)
+
+ggplot(df,aes(values,fill=Model))+
+  geom_density(alpha=0.4)+
+  xlim(c(0,2.5))+
+  ggtitle("Waiting Time Distributions")+
+  xlab("Waiting Times")+
+  ylab("Probability Density")+
+  theme_classic()+
+  geom_vline(xintercept=sample_mean,color="blue",size=1.5)+
+  theme(axis.text.x = element_text(color = "grey20", size = 32),
+        axis.text.y = element_text(color = "grey20", size = 32),  
+        axis.title.x = element_text(size = 32),
+        axis.title.y = element_text(size = 32),
+        legend.title=element_text(size=32), 
+        legend.text=element_text(size=32),
+        title = element_text(size=32, margin = margin(10, 0, 10, 0)))
+
+
+exp(-(1/sample_mean)*1.5) #Pr(Wait time > 1.5) = 0.135
+pexp(1.5,rate=1/sample_mean,lower.tail = FALSE) #Pr(Wait time > 1.5) = 0.135
+
+
+```
