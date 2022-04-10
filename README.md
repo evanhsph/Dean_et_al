@@ -11,7 +11,7 @@ This project looks at SEER data and applies queuing network model theory to asse
 All the code used for this project can be found in Code.\
 -**Project_Pancreas.rmd**: Includes code about the model, including calculating estimates, checking model assumptions, and creating plots for pancreas cancer.\
 -**Project_Cancer.rmd**: Combines data calculated from Project_Pancreas, as well as identical codes for kidney, liver, mesothelioma, and ovarian cancers to create comparison plots and tables.\
--**Markov_Sim.rmd**: We provide a stochastic agent-based simulation of a simple network with two compartments. We compute the simulation run time, which scales linearly with the size of the agent population. We compare empirical results from the simulation with theoretical results from an analogous queuing network model.\
+-**Markov_Sim.R**: We provide a stochastic agent-based simulation of a simple network with two compartments. We compute the simulation run time, which scales linearly with the size of the agent population. We compare empirical results from the simulation with theoretical results from an analogous queuing network model.\
 -**Service_time_distribution.rmd**: We compare how different modeling approaches approximate various waiting time distributions. Queuing models and simulations can use the 'true' distribution, while deterministic models take the average waiting time only, and Markov chains approximate with the best fitting exponential distribution. \
 -**Modeling_Framework_Outline.rmd**: Outline of the modeling framework in Fig 1. We show, in the abstract, how this framework can be used to quantify and compare the benefits of screening programs to different population subgroups.
 
